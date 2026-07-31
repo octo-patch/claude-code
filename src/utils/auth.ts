@@ -112,10 +112,7 @@ export function isAnthropicAuthEnabled(): boolean {
     return !!process.env.CLAUDE_CODE_OAUTH_TOKEN
   }
 
-  const is3P =
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
+  const is3P = getAPIProvider() !== 'firstParty'
 
   // Check if user has configured an external API key source
   // This allows externally-provided API keys to work (without requiring proxy configuration)
@@ -134,7 +131,7 @@ export function isAnthropicAuthEnabled(): boolean {
     apiKeySource === 'ANTHROPIC_API_KEY' || apiKeySource === 'apiKeyHelper'
 
   // Disable Anthropic auth if:
-  // 1. Using 3rd party services (Bedrock/Vertex/Foundry)
+  // 1. Using a third-party service
   // 2. User has an external API key (regardless of proxy configuration)
   // 3. User has an external auth token (regardless of proxy configuration)
   // this may cause issues if users have complex proxy / gateway "client-side creds" auth scenarios,
@@ -1586,16 +1583,10 @@ export function hasProfileScope(): boolean {
 export function is1PApiCustomer(): boolean {
   // 1P API customers are users who are NOT:
   // 1. Claude.ai subscribers (Max, Pro, Enterprise, Team)
-  // 2. Vertex AI users
-  // 3. AWS Bedrock users
-  // 4. Foundry users
+  // 2. Third-party API users
 
-  // Exclude Vertex, Bedrock, and Foundry customers
-  if (
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
-  ) {
+  // Exclude third-party API customers
+  if (getAPIProvider() !== 'firstParty') {
     return false
   }
 
@@ -1728,13 +1719,9 @@ export function getSubscriptionName(): string {
   }
 }
 
-/** Check if using third-party services (Bedrock or Vertex or Foundry) */
+/** Check if using a third-party API service. */
 export function isUsing3PServices(): boolean {
-  return !!(
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX) ||
-    isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
-  )
+  return getAPIProvider() !== 'firstParty'
 }
 
 /**

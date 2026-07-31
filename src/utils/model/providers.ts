@@ -1,7 +1,32 @@
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
 import { isEnvTruthy } from '../envUtils.js'
 
-export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry'
+export const MINIMAX_ANTHROPIC_BASE_URLS = [
+  'https://api.minimax.io/anthropic',
+  'https://api.minimaxi.com/anthropic',
+] as const
+
+export type APIProvider =
+  | 'firstParty'
+  | 'bedrock'
+  | 'vertex'
+  | 'foundry'
+  | 'minimax'
+
+export function isMiniMaxAnthropicBaseUrl(): boolean {
+  const baseUrl = process.env.ANTHROPIC_BASE_URL
+  if (!baseUrl) {
+    return false
+  }
+
+  try {
+    const url = new URL(baseUrl)
+    const normalized = `${url.origin}${url.pathname.replace(/\/+$/, '')}`
+    return MINIMAX_ANTHROPIC_BASE_URLS.some(endpoint => endpoint === normalized)
+  } catch {
+    return false
+  }
+}
 
 export function getAPIProvider(): APIProvider {
   return isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)
@@ -10,7 +35,9 @@ export function getAPIProvider(): APIProvider {
       ? 'vertex'
       : isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
         ? 'foundry'
-        : 'firstParty'
+        : isMiniMaxAnthropicBaseUrl()
+          ? 'minimax'
+          : 'firstParty'
 }
 
 export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
