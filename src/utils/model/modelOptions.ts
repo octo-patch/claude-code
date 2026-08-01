@@ -10,6 +10,8 @@ import {
   COST_TIER_3_15,
   COST_HAIKU_35,
   COST_HAIKU_45,
+  COST_MINIMAX_M27,
+  COST_MINIMAX_M3,
   formatModelPricing,
 } from '../modelCost.js'
 import { getSettings_DEPRECATED } from '../settings/settings.js'
@@ -32,6 +34,7 @@ import {
 } from './model.js'
 import { has1mContext } from '../context.js'
 import { getGlobalConfig } from '../config.js'
+import { MINIMAX_M27_CONFIG, MINIMAX_M3_CONFIG } from './configs.js'
 
 // @[MODEL LAUNCH]: Update all the available and default model option strings below.
 
@@ -200,6 +203,22 @@ function getHaiku35Option(): ModelOption {
   }
 }
 
+function getMiniMaxOptions(fastMode = false): ModelOption[] {
+  return [
+    getDefaultOptionForUser(fastMode),
+    {
+      value: MINIMAX_M3_CONFIG.modelId,
+      label: 'MiniMax M3',
+      description: `MiniMax M3 · 1M context · ${formatModelPricing(COST_MINIMAX_M3)}`,
+    },
+    {
+      value: MINIMAX_M27_CONFIG.modelId,
+      label: 'MiniMax M2.7',
+      description: `MiniMax M2.7 · 204.8K context · ${formatModelPricing(COST_MINIMAX_M27)}`,
+    },
+  ]
+}
+
 function getHaikuOption(): ModelOption {
   // Return correct Haiku option based on provider
   const haikuModel = getDefaultHaikuModel()
@@ -339,6 +358,10 @@ function getModelOptionsBase(fastMode = false): ModelOption[] {
     }
     payg1POptions.push(getHaiku45Option())
     return payg1POptions
+  }
+
+  if (getAPIProvider() === 'minimax') {
+    return getMiniMaxOptions(fastMode)
   }
 
   // PAYG 3P: Default (Sonnet 4.5) + Sonnet (3P custom) or Sonnet 4.6/1M + Opus (3P custom) or Opus 4.1/Opus 4.6/Opus1M + Haiku + Opus 4.1

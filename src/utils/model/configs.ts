@@ -1,7 +1,46 @@
 import type { ModelName } from './model.js'
 import type { APIProvider } from './providers.js'
 
-export type ModelConfig = Record<APIProvider, ModelName>
+export type BuiltinModelProvider = Exclude<APIProvider, 'minimax'>
+export type ModelConfig = Record<BuiltinModelProvider, ModelName>
+export type MiniMaxModelConfig = {
+  modelId: ModelName
+  contextWindow: number
+  pricingUsdPerMillionTokens: {
+    input: number
+    output: number
+    cacheRead: number
+    cacheWrite: number | null
+  }
+  inputModalities: readonly string[]
+  thinking: readonly string[]
+}
+
+export const MINIMAX_M3_CONFIG = {
+  modelId: 'MiniMax-M3',
+  contextWindow: 1_000_000,
+  pricingUsdPerMillionTokens: {
+    input: 0.6,
+    output: 2.4,
+    cacheRead: 0.12,
+    cacheWrite: null,
+  },
+  inputModalities: ['text', 'image', 'video'],
+  thinking: ['adaptive', 'disabled'],
+} as const satisfies MiniMaxModelConfig
+
+export const MINIMAX_M27_CONFIG = {
+  modelId: 'MiniMax-M2.7',
+  contextWindow: 204_800,
+  pricingUsdPerMillionTokens: {
+    input: 0.3,
+    output: 1.2,
+    cacheRead: 0.06,
+    cacheWrite: 0.375,
+  },
+  inputModalities: ['text'],
+  thinking: ['always_on'],
+} as const satisfies MiniMaxModelConfig
 
 // @[MODEL LAUNCH]: Add a new CLAUDE_*_CONFIG constant here. Double check the correct model strings
 // here since the pattern may change.

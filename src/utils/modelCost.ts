@@ -15,6 +15,8 @@ import {
   CLAUDE_SONNET_4_5_CONFIG,
   CLAUDE_SONNET_4_6_CONFIG,
   CLAUDE_SONNET_4_CONFIG,
+  MINIMAX_M27_CONFIG,
+  MINIMAX_M3_CONFIG,
 } from './model/configs.js'
 import {
   firstPartyNameToCanonical,
@@ -86,6 +88,24 @@ export const COST_HAIKU_45 = {
   webSearchRequests: 0.01,
 } as const satisfies ModelCosts
 
+export const COST_MINIMAX_M3 = {
+  inputTokens: MINIMAX_M3_CONFIG.pricingUsdPerMillionTokens.input,
+  outputTokens: MINIMAX_M3_CONFIG.pricingUsdPerMillionTokens.output,
+  promptCacheWriteTokens:
+    MINIMAX_M3_CONFIG.pricingUsdPerMillionTokens.cacheWrite ?? 0,
+  promptCacheReadTokens: MINIMAX_M3_CONFIG.pricingUsdPerMillionTokens.cacheRead,
+  webSearchRequests: 0.01,
+} as const satisfies ModelCosts
+
+export const COST_MINIMAX_M27 = {
+  inputTokens: MINIMAX_M27_CONFIG.pricingUsdPerMillionTokens.input,
+  outputTokens: MINIMAX_M27_CONFIG.pricingUsdPerMillionTokens.output,
+  promptCacheWriteTokens:
+    MINIMAX_M27_CONFIG.pricingUsdPerMillionTokens.cacheWrite ?? 0,
+  promptCacheReadTokens: MINIMAX_M27_CONFIG.pricingUsdPerMillionTokens.cacheRead,
+  webSearchRequests: 0.01,
+} as const satisfies ModelCosts
+
 const DEFAULT_UNKNOWN_MODEL_COST = COST_TIER_5_25
 
 /**
@@ -123,6 +143,8 @@ export const MODEL_COSTS: Record<ModelShortName, ModelCosts> = {
     COST_TIER_5_25,
   [firstPartyNameToCanonical(CLAUDE_OPUS_4_6_CONFIG.firstParty)]:
     COST_TIER_5_25,
+  [firstPartyNameToCanonical(MINIMAX_M3_CONFIG.modelId)]: COST_MINIMAX_M3,
+  [firstPartyNameToCanonical(MINIMAX_M27_CONFIG.modelId)]: COST_MINIMAX_M27,
 }
 
 /**

@@ -14,6 +14,7 @@ import { getUserAgent } from 'src/utils/http.js'
 import { getSmallFastModel } from 'src/utils/model/model.js'
 import {
   getAPIProvider,
+  getMiniMaxAnthropicBaseUrl,
   isFirstPartyAnthropicBaseUrl,
 } from 'src/utils/model/providers.js'
 import { getProxyFetchOptions } from 'src/utils/proxy.js'
@@ -295,6 +296,18 @@ export async function getAnthropicClient({
     }
     // we have always been lying about the return type - this doesn't support batching or models
     return new AnthropicVertex(vertexArgs) as unknown as Anthropic
+  }
+  if (getAPIProvider() === 'minimax') {
+    const minimaxAuthToken =
+      apiKey || process.env.ANTHROPIC_AUTH_TOKEN || getAnthropicApiKey()
+    const minimaxArgs: ConstructorParameters<typeof Anthropic>[0] = {
+      apiKey: null,
+      authToken: minimaxAuthToken,
+      baseURL: getMiniMaxAnthropicBaseUrl(),
+      ...ARGS,
+      ...(isDebugToStdErr() && { logger: createStderrLogger() }),
+    }
+    return new Anthropic(minimaxArgs)
   }
 
   // Determine authentication method based on available tokens

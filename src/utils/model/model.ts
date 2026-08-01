@@ -258,6 +258,12 @@ export function firstPartyNameToCanonical(name: ModelName): ModelShortName {
   if (name.includes('claude-3-sonnet')) {
     return 'claude-3-sonnet'
   }
+  if (name.includes('minimax-m3')) {
+    return 'minimax-m3'
+  }
+  if (name.includes('minimax-m2.7')) {
+    return 'minimax-m2.7'
+  }
   if (name.includes('claude-3-haiku')) {
     return 'claude-3-haiku'
   }
@@ -348,6 +354,10 @@ export function renderModelSetting(setting: ModelName | ModelAlias): string {
  */
 export function getPublicModelDisplayName(model: ModelName): string | null {
   switch (model) {
+    case 'MiniMax-M3':
+      return 'MiniMax M3'
+    case 'MiniMax-M2.7':
+      return 'MiniMax M2.7'
     case getModelStrings().opus46:
       return 'Opus 4.6'
     case getModelStrings().opus46 + '[1m]':
@@ -424,6 +434,10 @@ export function renderModelName(model: ModelName): string {
  */
 export function getPublicModelName(model: ModelName): string {
   const publicName = getPublicModelDisplayName(model)
+  const canonical = getCanonicalName(model)
+  if (canonical.startsWith('minimax-')) {
+    return publicName ?? model
+  }
   if (publicName) {
     return `Claude ${publicName}`
   }
@@ -608,6 +622,12 @@ export function getMarketingNameForModel(modelId: string): string | undefined {
   }
   if (canonical.includes('claude-3-5-haiku')) {
     return 'Claude 3.5 Haiku'
+  }
+  if (canonical.includes('minimax-m3')) {
+    return 'MiniMax M3'
+  }
+  if (canonical.includes('minimax-m2.7')) {
+    return 'MiniMax M2.7'
   }
 
   return undefined

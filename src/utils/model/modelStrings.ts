@@ -9,7 +9,10 @@ import { findFirstMatch, getBedrockInferenceProfiles } from './bedrock.js'
 import {
   ALL_MODEL_CONFIGS,
   CANONICAL_ID_TO_KEY,
+  MINIMAX_M27_CONFIG,
+  MINIMAX_M3_CONFIG,
   type CanonicalModelId,
+  type BuiltinModelProvider,
   type ModelKey,
 } from './configs.js'
 import { type APIProvider, getAPIProvider } from './providers.js'
@@ -22,10 +25,23 @@ export type ModelStrings = Record<ModelKey, string>
 
 const MODEL_KEYS = Object.keys(ALL_MODEL_CONFIGS) as ModelKey[]
 
-function getBuiltinModelStrings(provider: APIProvider): ModelStrings {
+function getMiniMaxModelStrings(): ModelStrings {
   const out = {} as ModelStrings
   for (const key of MODEL_KEYS) {
-    out[key] = ALL_MODEL_CONFIGS[key][provider]
+    out[key] = key.startsWith('haiku')
+      ? MINIMAX_M27_CONFIG.modelId
+      : MINIMAX_M3_CONFIG.modelId
+  }
+  return out
+}
+
+function getBuiltinModelStrings(provider: APIProvider): ModelStrings {
+  if (provider === 'minimax') {
+    return getMiniMaxModelStrings()
+  }
+  const out = {} as ModelStrings
+  for (const key of MODEL_KEYS) {
+    out[key] = ALL_MODEL_CONFIGS[key][provider as BuiltinModelProvider]
   }
   return out
 }

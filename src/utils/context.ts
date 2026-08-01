@@ -2,6 +2,7 @@
 import { CONTEXT_1M_BETA_HEADER } from '../constants/betas.js'
 import { getGlobalConfig } from './config.js'
 import { isEnvTruthy } from './envUtils.js'
+import { MINIMAX_M27_CONFIG, MINIMAX_M3_CONFIG } from './model/configs.js'
 import { getCanonicalName } from './model/model.js'
 import { getModelCapability } from './model/modelCapabilities.js'
 
@@ -69,6 +70,14 @@ export function getContextWindowForModel(
   // [1m] suffix — explicit client-side opt-in, respected over all detection
   if (has1mContext(model)) {
     return 1_000_000
+  }
+
+  const canonical = getCanonicalName(model)
+  if (canonical === 'minimax-m3') {
+    return MINIMAX_M3_CONFIG.contextWindow
+  }
+  if (canonical === 'minimax-m2.7') {
+    return MINIMAX_M27_CONFIG.contextWindow
   }
 
   const cap = getModelCapability(model)
