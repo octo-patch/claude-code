@@ -17,7 +17,7 @@ function isMiniMaxAnthropicBaseUrl(): boolean {
     const url = new URL(baseUrl)
     return (
       url.protocol === 'https:' &&
-      url.host === 'api.minimax.io' &&
+      (url.host === 'api.minimax.io' || url.host === 'api.minimaxi.com') &&
       url.pathname.replace(/\/+$/, '') === '/anthropic'
     )
   } catch {
